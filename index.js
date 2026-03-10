@@ -29,9 +29,15 @@ function createBot() {
   });
 
   bot.on('spawn', () => {
-    console.log("البوت رسبن الآن داخل العالم!");
-    // إذا كان السيرفر يحتاج تسجيل دخول، فك التعليق عن السطر التالي:
-    // bot.chat('/login PASSWORD'); 
+console.log("البوت رسبن الآن داخل العالم!");
+    
+    // ننتظر ثانية واحدة ثم نرسل الأوامر
+    setTimeout(() => {
+       // استبدل PASSWORD بكلمة السر الحقيقية التي اخترتها للبوت
+       bot.chat('/register mrx1ever mrx1ever'); 
+       bot.chat('/login mrx1ever'); 
+       console.log("تم إرسال أوامر تسجيل الدخول!");
+    }, 1000);
   });
 
   bot.on('kicked', (reason) => {
