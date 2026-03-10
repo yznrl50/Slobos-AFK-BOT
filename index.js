@@ -1,20 +1,21 @@
 const mineflayer = require('mineflayer')
 const http = require('http');
 
-// 1. خادم ويب صغير لإقناع Render أن البوت هو موقع ويب نشط
+// 1. خادم ويب لإبقاء Render مستيقظاً
 http.createServer((req, res) => {
   res.writeHead(200, { 'Content-Type': 'text/plain' });
   res.write("Slobos AFK Bot is Running!");
   res.end();
 }).listen(process.env.PORT || 3000);
 
-// 2. إعدادات البوت
+// 2. إعدادات البوت بالبيانات الجديدة (Aternos)
 const botArgs = {
-  host: 'Slobos.mcraft.pro', // آيبي السيرفر
-  port: 25565,               // بورت السيرفر
-  username: 'Slobos_AFK',    // اسم البوت
-  version: "1.19.4",         // نسخة الماينكرافت
-  viewDistance: "tiny",      // تقليل الرؤية لتوفير الرام (مهم جداً)
+  host: 'mrx1ever.aternos.me', // الآيبي الصحيح
+  port: 43820,                // البورت الصحيح
+  username: 'Slobos_AFK',     
+  version: false,             // خله false عشان يتوافق مع ViaVersion تلقائياً
+  hideErrors: false,
+  viewDistance: "tiny",
   loadInternalPlugins: false
 };
 
@@ -24,16 +25,30 @@ function createBot() {
   bot = mineflayer.createBot(botArgs);
 
   bot.on('login', () => {
-    console.log("البوت دخل السيرفر بنجاح!");
+    console.log("تم الاتصال بنجاح بسيرفر mrx1ever!");
+  });
+
+  bot.on('spawn', () => {
+    console.log("البوت رسبن الآن داخل العالم!");
+    // إذا كان السيرفر يحتاج تسجيل دخول، فك التعليق عن السطر التالي:
+    // bot.chat('/login PASSWORD'); 
+  });
+
+  bot.on('kicked', (reason) => {
+    console.log("البوت طُرد من السيرفر! السبب: " + reason);
+  });
+
+  bot.on('messagestr', (message) => {
+    console.log("رسالة من السيرفر: " + message);
   });
 
   bot.on('end', () => {
-    console.log("انقطع الاتصال، جاري إعادة المحاولة بعد 10 ثواني...");
-    setTimeout(createBot, 10000);
+    console.log("انقطع الاتصال، جاري إعادة المحاولة بعد 15 ثانية...");
+    setTimeout(createBot, 15000); // زدنا الوقت قليلاً لراحة سيرفر أترنوس
   });
 
   bot.on('error', (err) => {
-    console.log("حدث خطأ: " + err);
+    console.log("حدث خطأ تقني: " + err);
   });
 }
 
