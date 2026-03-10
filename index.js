@@ -1,3 +1,9 @@
+const http = require('http');
+http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.write("Slobos AFK Bot is Running!");
+  res.end();
+}).listen(process.env.PORT || 3000);
 const mineflayer = require('mineflayer');
 const { Movements, pathfinder, goals } = require('mineflayer-pathfinder');
 const { GoalBlock } = goals;
