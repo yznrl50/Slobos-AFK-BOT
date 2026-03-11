@@ -1,60 +1,50 @@
 const mineflayer = require('mineflayer')
 const http = require('http');
 
-// 1. خادم ويب لإبقاء Render مستيقظاً
+// خادم الويب لإبقاء Render مستيقظاً
 http.createServer((req, res) => {
-  res.writeHead(200, { 'Content-Type': 'text/plain' });
-  res.write("Slobos AFK Bot is Running!");
-  res.end();
+  res.writeHead(200);
+  res.end("Slobos Bot is Online!");
 }).listen(process.env.PORT || 3000);
 
-// 2. إعدادات البوت بالبيانات الجديدة (Aternos)
+console.log("--- [النظام] جاري بدء التشغيل باستخدام Dyn IP ---");
+
 const botArgs = {
-  host: 'mrx1ever.aternos.me', // الآيبي الصحيح
-  port: 43820,                // البورت الصحيح
-  username: 'Slobos_AFK',     
-  version: false,             // خله false عشان يتوافق مع ViaVersion تلقائياً
-  hideErrors: false,
-  viewDistance: "tiny",
-  loadInternalPlugins: false
+  host: 'basenji.aternos.host', // العنوان الجديد هنا
+  port: 43820,                  // البورت
+  username: 'Slobos_AFK',
+  version: false,
+  hideErrors: false
 };
 
-let bot;
-
 function createBot() {
-  bot = mineflayer.createBot(botArgs);
+  console.log("--- [بوت] محاولة الاتصال بـ " + botArgs.host + " ---");
+  const bot = mineflayer.createBot(botArgs);
 
   bot.on('login', () => {
-    console.log("تم الاتصال بنجاح بسيرفر mrx1ever!");
+    console.log("--- [نجاح] تم الاتصال بالسيرفر! ---");
   });
 
   bot.on('spawn', () => {
-console.log("البوت رسبن الآن داخل العالم!");
-    
-    // ننتظر ثانية واحدة ثم نرسل الأوامر
+    console.log("--- [تنبيه] البوت رسبن الآن ---");
     setTimeout(() => {
-       // استبدل PASSWORD بكلمة السر الحقيقية التي اخترتها للبوت
-       bot.chat('/register mrx1ever mrx1ever'); 
-       bot.chat('/login mrx1ever'); 
-       console.log("تم إرسال أوامر تسجيل الدخول!");
-    }, 1000);
-  });
-
-  bot.on('kicked', (reason) => {
-    console.log("البوت طُرد من السيرفر! السبب: " + reason);
-  });
-
-  bot.on('messagestr', (message) => {
-    console.log("رسالة من السيرفر: " + message);
-  });
-
-  bot.on('end', () => {
-    console.log("انقطع الاتصال، جاري إعادة المحاولة بعد 15 ثانية...");
-    setTimeout(createBot, 15000); // زدنا الوقت قليلاً لراحة سيرفر أترنوس
+        bot.chat('/register Slobos123 Slobos123'); // تأكد من تغيير كلمة السر
+        bot.chat('/login Slobos123');
+        console.log("--- [AuthMe] تم إرسال الأوامر ---");
+    }, 2000);
   });
 
   bot.on('error', (err) => {
-    console.log("حدث خطأ تقني: " + err);
+    console.log("--- [خطأ] " + err.message);
+  });
+
+  bot.on('kicked', (reason) => {
+    console.log("--- [طرد] السبب: " + reason);
+  });
+
+  bot.on('end', () => {
+    console.log("--- [إعادة] محاولة اتصال جديدة بعد 20 ثانية ---");
+    setTimeout(createBot, 20000);
   });
 }
 
