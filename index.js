@@ -1,39 +1,44 @@
 const mineflayer = require('mineflayer');
 const http = require('http');
 
-// إبقاء ريندر متصلاً
-http.createServer((req, res) => { res.end("Bot is Online"); }).listen(process.env.PORT || 3000);
+http.createServer((req, res) => { res.end("Bot is Active"); }).listen(process.env.PORT || 3000);
 
 const settings = {
-    host: '185.107.193.116', // الرقم اللي استخرجته
+    host: '185.107.193.116',
     port: 43820,
     username: 'Slobos_AFK',
-    version: '1.21.1' 
+    version: '1.21.1'
 };
 
 function startBot() {
-    console.log("--- جاري محاولة الدخول بالآيبي المباشر... ---");
+    console.log("--- محاولة الدخول... ---");
     const bot = mineflayer.createBot(settings);
 
+    // أول ما يدخل السيرفر (قبل الرسبون)
     bot.on('login', () => {
-        console.log("--- [نجاح باهر] البوت داخل السيرفر الآن! ---");
+        console.log("--- البوت دخل، جاري محاولة تسجيل الدخول... ---");
+        // نرسل الأمر بسرعة عشان AuthMe ما يطرده
+        setTimeout(() => {
+            bot.chat('/login Slobos123'); // تأكد أن الباسورد صحيحة
+            console.log("--- تم إرسال أمر /login ---");
+        }, 2000); 
     });
 
     bot.on('spawn', () => {
-        console.log("--- البوت رسبن في العالم ---");
+        console.log("--- البوت رسبن وجاهز ---");
+        // نرسل الأمر مرة ثانية للاحتياط بعد الرسبون
         setTimeout(() => {
-            bot.chat('/login Slobos123'); // تأكد من كلمة سر البوت في السيرفر
+            bot.chat('/login Slobos123');
             bot.chat('/fly');
-        }, 5000);
+        }, 3000);
     });
 
-    bot.on('error', (err) => {
-        console.log("--- [خطأ] " + err.message);
-    });
+    bot.on('error', (err) => console.log("خطأ: " + err.message));
 
+    // أهم جزء: لو انطرد يرجع بعد 10 ثواني
     bot.on('end', () => {
-        console.log("--- انقطع الاتصال، سأحاول العودة بعد 30 ثانية ---");
-        setTimeout(startBot, 30000);
+        console.log("--- انقطع الاتصال (ممكن طرد من AuthMe)، بحاول أرجع بعد 10 ثواني ---");
+        setTimeout(startBot, 10000);
     });
 }
 
