@@ -1,42 +1,38 @@
 const mineflayer = require('mineflayer');
-const http = require('http');
+const net = require('net');
 
-// خادم الويب
-http.createServer((req, res) => {
-  res.writeHead(200);
-  res.end("Bot is trying...");
-}).listen(process.env.PORT || 3000);
+const settings = {
+    host: 'basenji.aternos.host',
+    port: 43820,
+    username: 'Slobos_AFK',
+    version: '1.12.2' // نسخة خفيفة لتخطي الحماية
+};
 
-console.log("--- [1] بدأت المحاولة الآن ---");
+console.log("--- [1] جاري فحص هل السيرفر مفتوح أصلاً؟ ---");
 
-const bot = mineflayer.createBot({
-  host: 'basenji.aternos.host', 
-  port: 43820,
-  username: 'Slobos_AFK',
-  version: '1.20.1', // جرب هذه النسخة حتى لو سيرفرك 1.21، فهي الأسرع في الربط
-  hideErrors: false,
-  connectTimeout: 90000 // رفعنا المهلة لـ 90 ثانية
+// فحص الاتصال بالمنفذ أولاً
+const client = net.connect(settings.port, settings.host, () => {
+    console.log("--- [2] تم العثور على السيرفر! جاري إرسال البوت... ---");
+    client.destroy();
+    startBot();
 });
 
-// هذا السطر سيكشف لنا لو أترنوس رد علينا بأي شيء
-bot._client.on('connect', () => {
-    console.log("--- [2] تم فتح الاتصال الأولي (السيرفر رد)! ---");
+client.on('error', (err) => {
+    console.log("--- [!] السيرفر لا يرد (غالباً محظور من ريندر): " + err.message);
 });
 
-bot.on('login', () => {
-    console.log("--- [3] البوت دخل السيرفر! ---");
-});
+function startBot() {
+    const bot = mineflayer.createBot(settings);
 
-bot.on('spawn', () => {
-    console.log("--- [4] البوت رسبن وجاهز ---");
-    bot.chat('/login Slobos123');
-});
+    bot.on('login', () => {
+        console.log("--- [3] نجاح! البوت دخل السيرفر ---");
+    });
 
-bot.on('error', (err) => {
-    console.log("--- [!] خطأ تقني: " + err.message + " ---");
-});
+    bot.on('spawn', () => {
+        console.log("--- [4] البوت رسبن وجاهز ---");
+        bot.chat('/login Slobos123');
+    });
 
-bot.on('end', () => {
-    console.log("--- [!] انتهى الاتصال، جاري الإعادة بعد 30 ثانية ---");
-    setTimeout(() => { location.reload(); }, 30000);
-});
+    bot.on('error', (err) => console.log("خطأ البوت: " + err.message));
+    bot.on('end', () => setTimeout(startBot, 10000));
+}
