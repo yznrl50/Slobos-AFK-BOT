@@ -1,47 +1,50 @@
 const mineflayer = require('mineflayer');
 const http = require('http');
 
-// 1. فتح منفذ ويب فوراً عشان Render ما يقفل البوت
+// فتح منفذ ويب عشان Render ما يطردنا
 http.createServer((req, res) => {
   res.writeHead(200);
-  res.end("Bot Status: Searching for Server...");
+  res.end("Slobos Bot is Running on 1.21.1");
 }).listen(process.env.PORT || 3000);
 
-console.log("--- [1] صفحة الويب جاهزة، Render المفروض الحين يرتاح ---");
+console.log("--- [1] تشغيل السيرفر الوهمي بنجاح ---");
 
 const settings = {
-    host: '185.107.193.116',
+    host: '185.107.193.116', // الأرقام بدون أقواس
     port: 43820,
     username: 'Slobos_AFK',
-    version: '1.21.1'
+    version: '1.21.1' // بما أن عندك ViaVersion فهذه النسخة ستعمل 100%
 };
 
 function startBot() {
-    console.log("--- [2] محاولة الاتصال بـ أترنوس... ---");
-    
+    console.log("--- [2] جاري محاولة الدخول بالآيبي العددي... ---");
     const bot = mineflayer.createBot(settings);
 
-    bot.on('login', () => {
-        console.log("--- [3] نجاح! البوت دخل السيرفر ---");
-    });
-
     bot.on('spawn', () => {
-        console.log("--- [4] البوت رسبن وجاهز ---");
-        // تأكد من كلمة السر، إذا كانت خطأ البوت بيطرد
+        console.log("--- [3] نجاح! البوت دخل السيرفر الآن ---");
+        
         setTimeout(() => {
-            bot.chat('/login Slobos123');
-        }, 5000);
+            // تسجيل الدخول
+            bot.chat('/login Slobos123'); 
+            console.log("--- [4] تم إرسال أمر تسجيل الدخول ---");
+        }, 3000);
+
+        setTimeout(() => {
+            // تفعيل الطيران
+            bot.chat('/fly'); 
+            bot.creative.startFlying(); // أمر برمجي لجعل البوت يطير فعلياً
+            console.log("--- [5] تم تفعيل وضع الطيران لمنع الـ AFK ---");
+        }, 6000);
     });
 
     bot.on('error', (err) => {
-        console.log("--- [!] خطأ: " + err.message);
+        console.log("--- [!] حدث خطأ: " + err.message);
     });
 
     bot.on('end', () => {
-        console.log("--- [!] انقطع الاتصال، بحاول أرجع بعد 30 ثانية ---");
-        setTimeout(startBot, 30000);
+        console.log("--- [!] انقطع الاتصال، سأحاول العودة بعد 20 ثانية ---");
+        setTimeout(startBot, 20000);
     });
 }
 
-// ابدأ المحاولة
 startBot();
