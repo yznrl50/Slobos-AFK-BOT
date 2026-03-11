@@ -1,27 +1,24 @@
 const mineflayer = require('mineflayer');
-const net = require('net');
+const http = require('http');
+
+// 1. فتح منفذ ويب فوراً عشان Render ما يقفل البوت
+http.createServer((req, res) => {
+  res.writeHead(200);
+  res.end("Bot Status: Searching for Server...");
+}).listen(process.env.PORT || 3000);
+
+console.log("--- [1] صفحة الويب جاهزة، Render المفروض الحين يرتاح ---");
 
 const settings = {
     host: 'basenji.aternos.host',
     port: 43820,
     username: 'Slobos_AFK',
-    version: '1.12.2' // نسخة خفيفة لتخطي الحماية
+    version: '1.20.1'
 };
 
-console.log("--- [1] جاري فحص هل السيرفر مفتوح أصلاً؟ ---");
-
-// فحص الاتصال بالمنفذ أولاً
-const client = net.connect(settings.port, settings.host, () => {
-    console.log("--- [2] تم العثور على السيرفر! جاري إرسال البوت... ---");
-    client.destroy();
-    startBot();
-});
-
-client.on('error', (err) => {
-    console.log("--- [!] السيرفر لا يرد (غالباً محظور من ريندر): " + err.message);
-});
-
 function startBot() {
+    console.log("--- [2] محاولة الاتصال بـ أترنوس... ---");
+    
     const bot = mineflayer.createBot(settings);
 
     bot.on('login', () => {
@@ -30,9 +27,21 @@ function startBot() {
 
     bot.on('spawn', () => {
         console.log("--- [4] البوت رسبن وجاهز ---");
-        bot.chat('/login Slobos123');
+        // تأكد من كلمة السر، إذا كانت خطأ البوت بيطرد
+        setTimeout(() => {
+            bot.chat('/login Slobos123');
+        }, 5000);
     });
 
-    bot.on('error', (err) => console.log("خطأ البوت: " + err.message));
-    bot.on('end', () => setTimeout(startBot, 10000));
+    bot.on('error', (err) => {
+        console.log("--- [!] خطأ: " + err.message);
+    });
+
+    bot.on('end', () => {
+        console.log("--- [!] انقطع الاتصال، بحاول أرجع بعد 30 ثانية ---");
+        setTimeout(startBot, 30000);
+    });
 }
+
+// ابدأ المحاولة
+startBot();
