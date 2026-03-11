@@ -1,44 +1,40 @@
 const mineflayer = require('mineflayer');
 const http = require('http');
 
-http.createServer((req, res) => { res.end("Bot is Active"); }).listen(process.env.PORT || 3000);
+// فتح منفذ ويب لإبقاء ريندر شغالاً
+http.createServer((req, res) => {
+  res.writeHead(200);
+  res.end("Slobos AFK Bot: Running smoothly without AuthMe");
+}).listen(process.env.PORT || 3000);
 
 const settings = {
-    host: '185.107.193.116',
+    host: '185.107.193.116', // الآيبي المباشر الذي استخرجناه
     port: 43820,
     username: 'Slobos_AFK',
     version: '1.21.1'
 };
 
 function startBot() {
-    console.log("--- محاولة الدخول... ---");
+    console.log("--- جاري محاولة الدخول بالآيبي المباشر... ---");
     const bot = mineflayer.createBot(settings);
 
-    // أول ما يدخل السيرفر (قبل الرسبون)
-    bot.on('login', () => {
-        console.log("--- البوت دخل، جاري محاولة تسجيل الدخول... ---");
-        // نرسل الأمر بسرعة عشان AuthMe ما يطرده
-        setTimeout(() => {
-            bot.chat('/login Slobos123'); // تأكد أن الباسورد صحيحة
-            console.log("--- تم إرسال أمر /login ---");
-        }, 2000); 
-    });
-
     bot.on('spawn', () => {
-        console.log("--- البوت رسبن وجاهز ---");
-        // نرسل الأمر مرة ثانية للاحتياط بعد الرسبون
+        console.log("--- [نجاح باهر] البوت داخل السيرفر الآن! ---");
+        // بما أن AuthMe لم يعد عائقاً، نكتفي بتفعيل الطيران بعد 3 ثوانٍ
         setTimeout(() => {
-            bot.chat('/login Slobos123');
             bot.chat('/fly');
+            bot.creative.startFlying();
+            console.log("--- البوت الآن في وضع الطيران ---");
         }, 3000);
     });
 
-    bot.on('error', (err) => console.log("خطأ: " + err.message));
+    bot.on('error', (err) => {
+        console.log("--- [خطأ] " + err.message);
+    });
 
-    // أهم جزء: لو انطرد يرجع بعد 10 ثواني
     bot.on('end', () => {
-        console.log("--- انقطع الاتصال (ممكن طرد من AuthMe)، بحاول أرجع بعد 10 ثواني ---");
-        setTimeout(startBot, 10000);
+        console.log("--- انقطع الاتصال، سأحاول العودة بعد 20 ثانية ---");
+        setTimeout(startBot, 20000);
     });
 }
 
