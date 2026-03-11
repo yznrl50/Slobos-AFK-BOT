@@ -1,58 +1,37 @@
 const mineflayer = require('mineflayer');
 const http = require('http');
 
-// خادم الويب لإبقاء Render شغال
+// تشغيل سيرفر الويب أولاً لإرضاء ريندر
 http.createServer((req, res) => {
   res.writeHead(200);
-  res.end("Bot status: Connecting...");
+  res.end("Bot is online");
 }).listen(process.env.PORT || 3000);
 
-console.log("--- [النظام] جاري محاولة اختراق جدار حماية أترنوس... ---");
+console.log("--- [1] بدأت المحاولة الآن ---");
 
-const botArgs = {
-  host: 'mrx1ever.aternos.me', 
+const bot = mineflayer.createBot({
+  host: 'basenji.aternos.host', // استخدم الـ Dyn IP لأنه أقوى في تجاوز الحظر
   port: 43820,
   username: 'Slobos_AFK',
-  version: '1.21.1',
+  version: '1.21.1', // جربنا 1.21، الحين نجرب 1.21.1 بدقة
   hideErrors: false,
-  keepAlive: true,
-  checkTimeoutInterval: 120000 // رفع المهلة لدقيقتين
-};
+  connectTimeout: 60000
+});
 
-function createBot() {
-  console.log(`--- [بوت] محاولة اتصال جديدة بـ ${botArgs.host}:${botArgs.port} ---`);
-  
-  const bot = mineflayer.createBot(botArgs);
+// هذا السطر سيطبع لك أي رد فعل من السيرفر فوراً
+bot.on('connect', () => console.log("--- [2] تم فتح الاتصال الأولي! ---"));
+bot.on('login', () => console.log("--- [3] البوت دخل السيرفر! ---"));
+bot.on('spawn', () => {
+    console.log("--- [4] البوت رسبن وجاهز ---");
+    bot.chat('/login Slobos123');
+});
 
-  // مراقبة الاتصال قبل الدخول
-  bot._client.on('connect', () => {
-    console.log("--- [نجاح مؤقت] تم فتح المنفذ! السيرفر رد علينا ---");
-  });
+// إذا فيه حظر آيبي، هذا السطر بيكشفه فوراً باللون الأحمر
+bot.on('error', (err) => {
+    console.log("--- [!] خطأ في الاتصال: " + err.message + " ---");
+});
 
-  bot.on('login', () => {
-    console.log("--- [نجاح] البوت دخل السيرفر فعلياً! ---");
-  });
-
-  bot.on('spawn', () => {
-    console.log("--- [تنبيه] البوت رسبن الآن ---");
-    setTimeout(() => {
-      bot.chat('/register Slobos123 Slobos123');
-      bot.chat('/login Slobos123');
-      console.log("--- [AuthMe] تم إرسال الأوامر ---");
-    }, 5000);
-  });
-
-  bot.on('error', (err) => {
-    console.log("--- [خطأ] " + err.code + " : " + err.message);
-    if (err.code === 'ECONNREFUSED') {
-       console.log("--- [تنبيه] أترنوس رفض الاتصال تماماً (حظر آيبي) ---");
-    }
-  });
-
-  bot.on('end', () => {
-    console.log("--- [إعادة] محاولة بعد 30 ثانية ---");
-    setTimeout(createBot, 30000);
-  });
-}
-
-createBot();
+bot.on('end', () => {
+    console.log("--- [!] انتهى الاتصال، جاري الإعادة بعد قليل ---");
+    // لا تضع إعادة تشغيل هنا حالياً لنرى الخطأ بوضوح
+});
