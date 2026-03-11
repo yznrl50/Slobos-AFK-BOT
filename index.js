@@ -9,7 +9,7 @@ http.createServer((req, res) => {
 }).listen(process.env.PORT || 3000);
 
 const botArgs = {
-  host: 'mrx1ever.aternos.me',
+  host: 'basenji.aternos.host',
   port: 43820,
   username: 'Slobos_AFK',
   version: '1.21', 
