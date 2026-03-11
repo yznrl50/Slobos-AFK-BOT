@@ -10,10 +10,10 @@ http.createServer((req, res) => {
 console.log("--- [1] صفحة الويب جاهزة، Render المفروض الحين يرتاح ---");
 
 const settings = {
-    host: 'basenji.aternos.host',
+    host: '185.107.193.116',
     port: 43820,
     username: 'Slobos_AFK',
-    version: '1.20.1'
+    version: '1.21.1'
 };
 
 function startBot() {
