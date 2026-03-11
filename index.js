@@ -10,7 +10,7 @@ http.createServer((req, res) => {
 console.log("--- [1] بدأت المحاولة الآن ---");
 
 const bot = mineflayer.createBot({
-  host: 'mrx1ever.aternos.me', 
+  host: 'basenji.aternos.host', 
   port: 43820,
   username: 'Slobos_AFK',
   version: '1.20.1', // جرب هذه النسخة حتى لو سيرفرك 1.21، فهي الأسرع في الربط
