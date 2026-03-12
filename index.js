@@ -19,12 +19,12 @@ function startBot() {
     const bot = mineflayer.createBot(settings);
 
     bot.on('spawn', () => {
-        console.log("--- [نجاح باهر] البوت داخل السيرفر الآن! ---");
-        // بما أن AuthMe لم يعد عائقاً، نكتفي بتفعيل الطيران بعد 3 ثوانٍ
+console.log("دخل البوت، جاري القفز لتثبيت الاتصال...");
+        bot.setControlState('jump', true);
+        setTimeout(() => bot.setControlState('jump', false), 1000);
+        
         setTimeout(() => {
             bot.chat('/fly');
-            bot.creative.startFlying();
-            console.log("--- البوت الآن في وضع الطيران ---");
         }, 3000);
     });
 
