@@ -1,40 +1,53 @@
 const mineflayer = require('mineflayer');
 const http = require('http');
 
-// فتح منفذ ويب لإبقاء ريندر شغالاً
-http.createServer((req, res) => {
-  res.writeHead(200);
-  res.end("Slobos AFK Bot: Running smoothly without AuthMe");
-}).listen(process.env.PORT || 3000);
+// للحفاظ على ريندر شغّال
+http.createServer((req, res) => { res.end("Bot is Active on Lemur Host"); }).listen(process.env.PORT || 3000);
 
 const settings = {
-    host: '185.107.193.116', // الآيبي المباشر الذي استخرجناه
+    host: 'lemur.aternos.host', // تأكدت من العنوان الجديد هنا
     port: 43820,
     username: 'Slobos_AFK',
-    version: '1.21.1'
+    version: '1.21.1',
+    connectTimeout: 30000
 };
 
 function startBot() {
-    console.log("--- جاري محاولة الدخول بالآيبي المباشر... ---");
+    console.log("--- جاري محاولة الدخول إلى عنوان Lemur الجديد... ---");
     const bot = mineflayer.createBot(settings);
 
+    // مؤقت أمان إذا علق الاتصال
+    const failSafe = setTimeout(() => {
+        console.log("--- الاتصال معلق، سأعيد المحاولة ---");
+        bot.quit();
+        startBot();
+    }, 45000);
+
+    bot.on('login', () => {
+        clearTimeout(failSafe);
+        console.log("--- [نجاح] البوت دخل السيرفر! ---");
+    });
+
     bot.on('spawn', () => {
-console.log("دخل البوت، جاري القفز لتثبيت الاتصال...");
+        console.log("--- البوت رسبن وجاهز ---");
         bot.setControlState('jump', true);
         setTimeout(() => bot.setControlState('jump', false), 1000);
         
         setTimeout(() => {
             bot.chat('/fly');
-        }, 3000);
+            console.log("--- تم تفعيل الطيران ---");
+        }, 5000);
     });
 
     bot.on('error', (err) => {
-        console.log("--- [خطأ] " + err.message);
+        clearTimeout(failSafe);
+        console.log("--- [خطأ]: " + err.message);
     });
 
     bot.on('end', () => {
-console.log("انقطع الاتصال، سأنتظر 40 ثانية لتجنب رسالة 'Username already playing'");
-        setTimeout(startBot, 40000); // زدنا الوقت هنا
+        clearTimeout(failSafe);
+        console.log("--- انقطع الاتصال، سأعود بعد 30 ثانية ---");
+        setTimeout(startBot, 30000);
     });
 }
 
