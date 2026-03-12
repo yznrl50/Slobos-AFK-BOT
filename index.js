@@ -33,8 +33,8 @@ function startBot() {
     });
 
     bot.on('end', () => {
-        console.log("--- انقطع الاتصال، سأحاول العودة بعد 20 ثانية ---");
-        setTimeout(startBot, 20000);
+console.log("انقطع الاتصال، سأنتظر 40 ثانية لتجنب رسالة 'Username already playing'");
+        setTimeout(startBot, 40000); // زدنا الوقت هنا
     });
 }
 
