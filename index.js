@@ -1,7 +1,7 @@
 const mineflayer = require('mineflayer');
 const http = require('http');
 
-http.createServer((req, res) => { res.end("System: Split-Bot Active"); }).listen(process.env.PORT || 3000);
+http.createServer((req, res) => { res.end("System: Forced Entry Active"); }).listen(process.env.PORT || 3000);
 
 const connectionSettings = {
     host: '185.107.194.193',
@@ -12,47 +12,45 @@ const connectionSettings = {
 const OFFICIAL_NAME = 'Slobos_AFK'; 
 
 function launchSystem() {
-    console.log("--- [1] إرسال التمويهي لفك الحظر... ---");
+    console.log("--- [1] محاولة إرسال بوت التمويه... ---");
     const decoy = mineflayer.createBot({
         ...connectionSettings,
         username: 'Ghost_' + Math.floor(Math.random() * 100)
     });
 
-    // بعد 10 ثوانٍ، نغلق التمويهي تماماً وننتظر قليلاً
-    setTimeout(() => {
-        console.log("--- [2] إغلاق التمويهي وانتظار 5 ثوانٍ لتنظيف الجلسة... ---");
+    // نضع تايم آوت للبوت التمويهي عشان ما يعلق النظام لو فشل
+    const decoyTimeout = setTimeout(() => {
+        console.log("--- [!] التمويهي أخذ وقت طويل، سيتم إغلاقه إجبارياً ---");
         decoy.quit();
+    }, 15000);
 
-        // ننتظر 5 ثوانٍ إضافية بعد خروج التمويهي قبل دخول الرسمي
-        setTimeout(() => {
-            console.log("--- [3] إرسال الرسمي الآن: " + OFFICIAL_NAME + " ---");
-            launchOfficial();
-        }, 5000);
-
-    }, 10000);
-}
-
-function launchOfficial() {
-    const bot = mineflayer.createBot({
-        ...connectionSettings,
-        username: OFFICIAL_NAME
+    decoy.once('login', () => {
+        console.log("--- التمويهي نجح في الدخول (Login) ---");
     });
 
-    bot.once('spawn', () => {
-        console.log("--- [نجاح] " + OFFICIAL_NAME + " استقر في السيرفر! ---");
-        bot.setControlState('jump', true);
-        setTimeout(() => bot.setControlState('jump', false), 1000);
-        setTimeout(() => { bot.chat('/fly'); }, 5000);
-    });
+    // الجزء الأهم: محاولة دخول البوت الرسمي بشكل مستقل تماماً
+    setTimeout(() => {
+        console.log("--- [2] محاولة إرسال البوت الرسمي الآن: " + OFFICIAL_NAME + " ---");
+        const officialBot = mineflayer.createBot({
+            ...connectionSettings,
+            username: OFFICIAL_NAME
+        });
 
-    bot.on('error', (err) => {
-        console.log("--- خطأ في الرسمي: " + err.message);
-    });
+        officialBot.once('spawn', () => {
+            console.log("--- [نجاح] البوت الرسمي استقر في السيرفر! ---");
+            setTimeout(() => { officialBot.chat('/fly'); }, 5000);
+        });
 
-    bot.on('end', () => {
-        console.log("--- انقطع الرسمي، إعادة النظام بعد 40 ثانية ---");
-        setTimeout(launchSystem, 40000);
-    });
+        officialBot.on('error', (err) => {
+            console.log("--- خطأ في البوت الرسمي: " + err.message);
+        });
+
+        officialBot.on('end', () => {
+            console.log("--- خرج الرسمي، إعادة المحاولة بعد دقيقة ---");
+            setTimeout(launchSystem, 60000);
+        });
+
+    }, 20000); // ينتظر 20 ثانية ليدخل الرسمي مهما كانت نتيجة الأول
 }
 
 launchSystem();
